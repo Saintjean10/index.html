@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>MedAssist Web</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  padding: 20px;
+}
+h2 {
+  color: #0a4d68;
+}
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  background: #0a4d68;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button:hover {
+  background: #088395;
+}
+.module {
+  background: white;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 8px;
+}
+.result {
+  margin-top: 10px;
+  padding: 10px;
+  background: #e8f1f2;
+  border-radius: 5px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+td, th {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>?? MedAssist Web</h2>
+
+<button onclick="adultes()">Adultes</button>
+<button onclick="pediatrie()">Enfants / Nourrissons</button>
+<button onclick="orthopedie()">Orthopédie</button>
+<button onclick="triades()">Triades massives</button>
+
+<div id="output" class="module"></div>
+
+<script>
+// ==================== DICTIONNAIRES ====================
+
+const triadesDB = {
+  "appendicite": ["Douleur FID", "Fièvre", "Vomissements"],
+  "méningite": ["Fièvre", "Raideur de nuque", "Altération conscience"],
+  "insuffisance cardiaque": ["Dyspnée", "Œdèmes", "Crépitants"],
+  "bronchiolite": ["Toux", "Polypnée", "Tirage"],
+  "cyanose congénitale": ["Cyanose", "Souffle cardiaque", "Hypoxie"]
+};
+
+const fractures = [
+  "Pouteau-Colles",
+  "Galeazzi",
+  "Montégia",
+  "Fracture du col fémoral",
+  "Fracture ouverte"
+];
+
+// ==================== FONCTIONS ====================
+
+function interpretation(val, min, max) {
+  if (val < min) return "BAS";
+  if (val > max) return "ÉLEVÉ";
+  return "NORMAL";
+}
+
+// ==================== MODULES ====================
+
+function adultes() {
+  let t = prompt("Température (°C)");
+  let fc = prompt("Fréquence cardiaque");
+  let fr = prompt("Fréquence respiratoire");
+  let ta = prompt("Tension systolique");
+  let spo2 = prompt("SpO2 (%)");
+  let poids = prompt("Poids (kg)");
+  let taille = prompt("Taille (m)");
+
+  let imc = (poids / (taille * taille)).toFixed(1);
+  let imcCat = imc < 18.5 ? "Insuffisance pondérale"
+             : imc < 25 ? "Poids normal"
+             : imc < 30 ? "Surpoids"
+             : "Obésité";
+
+  document.getElementById("output").innerHTML = `
+  <h3>?? Adultes</h3>
+  <table>
+    <tr><th>Paramètre</th><th>Valeur</th><th>Interprétation</th></tr>
+    <tr><td>Température</td><td>${t}</td><td>${interpretation(t,36,37.5)}</td></tr>
+    <tr><td>FC</td><td>${fc}</td><td>${interpretation(fc,60,100)}</td></tr>
+    <tr><td>FR</td><td>${fr}</td><td>${interpretation(fr,12,20)}</td></tr>
+    <tr><td>TA</td><td>${ta}</td><td>${interpretation(ta,90,140)}</td></tr>
+    <tr><td>SpO2</td><td>${spo2}</td><td>${interpretation(spo2,95,100)}</td></tr>
+  </table>
+  <div class="result">
+    <b>IMC :</b> ${imc} ? ${imcCat}
+  </div>
+  `;
+}
+
+function pediatrie() {
+  let fc = prompt("FC enfant");
+  let fr = prompt("FR enfant");
+  let t = prompt("Température");
+
+  document.getElementById("output").innerHTML = `
+  <h3>?? Pédiatrie</h3>
+  <table>
+    <tr><td>FC</td><td>${fc}</td><td>${interpretation(fc,80,160)}</td></tr>
+    <tr><td>FR</td><td>${fr}</td><td>${interpretation(fr,20,40)}</td></tr>
+    <tr><td>Température</td><td>${t}</td><td>${interpretation(t,36,37.5)}</td></tr>
+  </table>
+  <div class="result">
+    Scores possibles : Apgar simplifié / PEWS
+  </div>
+  `;
+}
+
+function orthopedie() {
+  let list = fractures.map(f => `<li>${f}</li>`).join("");
+  document.getElementById("output").innerHTML = `
+  <h3>?? Orthopédie</h3>
+  <ul>${list}</ul>
+  `;
+}
+
+function triades() {
+  let patho = prompt("Entrer la pathologie").toLowerCase();
+  let triade = triadesDB[patho];
+
+  document.getElementById("output").innerHTML = triade
+    ? `<h3>?? Triade de ${patho}</h3><ul>${triade.map(t=>`<li>${t}</li>`).join("")}</ul>`
+    : `<div class="result">Pathologie non trouvée</div>`;
+}
+</script>
+
+</body>
+</html>
